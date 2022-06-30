@@ -4,7 +4,8 @@ const { Client } = require("pg");
 
 const DB_URI = process.env.NODE_ENV === "test"
     ? "postgresql:///biztime_test"
-    : "postgresql://kestrel:obliviate@localhost/biztime";
+    : "postgresql:///biztime"
+    // : "postgresql://kestrel:obliviate@localhost/biztime";
 
 let db = new Client({
   connectionString: DB_URI
