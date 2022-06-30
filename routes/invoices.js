@@ -71,4 +71,31 @@ router.get("/:id", async function (req, res, next) {
     
 
 
+/** PUT / - Edit an existing company, takes JSON: { name, description }
+ *  Returns 404 if company code not found.
+ *  Else returns `{ company: { code, name, description } }` */
+
+ router.put("/:id", async function (req, res, next) {
+
+	if ("id" in req.body) throw new BadRequestError("Not allowed");
+    
+	const { amt } = req.body;
+	const id = req.params.id;
+    
+	const result = await db.query(
+	    `UPDATE invoices
+		SET amt = $1
+		WHERE id = $2
+		RETURNING id, comp_code, amt, paid, add_date, paid_date`,
+	    [amt, id]
+	);
+    
+	const editedInvoice = result.rows[0];
+	if (!editedInvoice) throw new NotFoundError(`No matching invoice: ${id}`);
+    
+	return res.json({ invoice: editedInvoice });
+    });
+    
+
+
 module.exports = router;
