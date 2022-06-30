@@ -1,3 +1,4 @@
+"use strict";
 /** Routes about company. */
 
 const express = require("express");

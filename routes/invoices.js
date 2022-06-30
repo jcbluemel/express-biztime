@@ -1,3 +1,4 @@
+"use strict";
 /** Routes about invoices. */
 
 const express = require("express");
@@ -12,7 +13,8 @@ const db = require("../db");
 router.get("/", async function (req, res, next) {
 	const results = await db.query(
 		`SELECT id, comp_code
-		FROM invoices`
+			FROM invoices
+			ORDER BY comp_code`
 	);
 	const invoices = results.rows;
 
@@ -26,6 +28,7 @@ router.get("/", async function (req, res, next) {
  *                   company: { code, name, description } }` */
 
 router.get("/:id", async function (req, res, next) {
+	//TODO: change company comp_code
 	const id = req.params.id;
 	const iResult = await db.query(
 		`SELECT id, amt, paid, add_date, paid_date, comp_code AS company
@@ -60,9 +63,8 @@ router.post("/", async function (req, res, next) {
 			(comp_code, amt)
 			VALUES ($1, $2)
 			RETURNING id, comp_code, amt, paid, add_date, paid_date `,
-		[comp_code, Number(amt)]
+		[comp_code, amt]
 	);
-
 	const newInvoice = result.rows[0];
 
 	return res.status(201).json({ invoice: newInvoice });
@@ -79,14 +81,14 @@ router.put("/:id", async function (req, res, next) {
 	if ("id" in req.body) throw new BadRequestError("Not allowed");
 
 	const { amt } = req.body;
-	const id = req.params.id;
+	const id = Number(req.params.id);
 
 	const result = await db.query(
 		`UPDATE invoices
 			SET amt = $1
 			WHERE id = $2
 			RETURNING id, comp_code, amt, paid, add_date, paid_date`,
-		[Number(amt), Number(id)]
+		[amt, id]
 	);
 
 	const editedInvoice = result.rows[0];
@@ -102,13 +104,13 @@ router.put("/:id", async function (req, res, next) {
 
 router.delete("/:id", async function (req, res, next) {
 
-	const id = req.params.id;
+	const id = Number(req.params.id);
 
 	const result = await db.query(
 		`DELETE FROM invoices
             WHERE id = $1
             RETURNING id`,
-		[Number(id)]
+		[id]
 	);
 
 	const deletedInvoiceId = result.rows[0];
