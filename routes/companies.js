@@ -6,6 +6,8 @@ const { NotFoundError, BadRequestError } = require("../expressError");
 const router = new express.Router();
 const db = require("../db");
 
+
+
 /** GET / - list of all companies
  *  returns `{ companies: [{ code, name }, ...]}` */
 
@@ -13,7 +15,7 @@ router.get("/", async function (req, res, next) {
     const results = await db.query("SELECT code, name FROM companies");
     const companies = results.rows;
 
-    return res.json({ companies: companies });
+    return res.json({ companies });
 });
 
 
@@ -31,7 +33,7 @@ router.get("/:code", async function (req, res, next) {
     const company = result.rows[0];
     if (!company) throw new NotFoundError(`No matching company: ${code}`);
 
-    return res.json({ company: company });
+    return res.json({ company });
 });
 
 
